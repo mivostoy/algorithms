@@ -11,14 +11,18 @@
  * 
  */
 public class Percolation {
-
+	// union find object
+	private WeightedQuickUnionUF grid;
+	// size of the grid
 	private int size;
+	// 2-dimensional array with sites - includes extra top/bot rows and left/right cols
 	private int site[][];
+	// index of virtual top
 	private int vtop;
+	// index of virtual bottom
 	private int vbottom;
 	private final int OPEN = 0;
 	private final int CLOSED = 1;
-	private WeightedQuickUnionUF grid;
 
 	/**
 	 * Initialize our structure by
@@ -75,10 +79,10 @@ public class Percolation {
 		if (site[row][col] == OPEN) {
 			return;		// already open
 		}
-		
+		// open this site
 		site[row][col] = OPEN;
-		// site has extra row [0] on top, extra col 0 on left
 		// check all 4 sides (including extras)
+		// site has extra row [0] on top, extra col 0 on left
 		int idx = index(row, col);
 		if (site[row - 1][col] == OPEN) {
 			grid.union(idx, index(row - 1, col));
@@ -95,13 +99,13 @@ public class Percolation {
 	}
 
 	/**
-	 * is site (row i, column j) open?
+	 * is site at (row i, column j) open?
 	 * 
 	 * @param i
 	 *            row (1..N)
 	 * @param j
 	 *            column (1..N)
-	 * @return
+	 * @return	true if site is open
 	 */
 	public boolean isOpen(int i, int j) {
 		if (i < 1 || i > size)
@@ -112,7 +116,7 @@ public class Percolation {
 	}
 
 	/**
-	 * is site (row i, column j) full? 
+	 * is site at (row i, column j) full? 
 	 * A full site is an open site that can be
 	 * connected to an open site in the top row via a chain of neighboring
 	 * (left, right, up, down) open sites
@@ -121,7 +125,7 @@ public class Percolation {
 	 *            row (1..N)
 	 * @param j
 	 *            column (1..N)
-	 * @return true if site (row i, column j) is full
+	 * @return true if site is full
 	 */
 	public boolean isFull(int i, int j) {
 		if (i < 1 || i > size)
@@ -149,7 +153,7 @@ public class Percolation {
 			StdOut.println(msg + " failed");
 		}
 	}
-
+	// self test
 	public static void main(String[] args) {
 		StdOut.println("start test 2");
 		Percolation p1 = new Percolation(1);

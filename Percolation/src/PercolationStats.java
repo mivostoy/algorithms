@@ -1,10 +1,19 @@
 /*
+ * Performs T independent computational experiments on an N-by-N grid
  * 
  */
 public class PercolationStats {
+	
+	private double [] threshold;
+	// mean
+	private double mu;
+	// stdev
+	private double sigma;
+	// number of experiments
+	private int T;
+	
 	/**
-	 * perform T independent computational experiments on an N-by-N grid
-	 * 
+	 * Initalizes stats object
 	 * @param N
 	 *            grid size
 	 * @param T
@@ -15,14 +24,29 @@ public class PercolationStats {
 			throw new IllegalArgumentException();
 		if (T < 1)
 			throw new IllegalArgumentException();
+		this.T= T;
+		int total = N*N;
+		threshold = new double[T];
 		// perform T experiments, exit if percolates, compute stats
 		for (int i=0; i<T; i++) {
 			Percolation grid = new Percolation(N);
-			//todo - monte-carlo
-			if (grid.percolates()) {
-				break;
-			}
+			int opened = 0;
+			do {
+				// monte-carlo - fill randomly the grid until percolates
+				int row = StdRandom.uniform(1, N+1);
+				int col = StdRandom.uniform(1, N+1);
+				//StdOut.println(String.format("open %d, %d", row, col));
+				if (!grid.isOpen(row, col)) {
+					grid.open(row, col);
+					opened++;
+				}
+			} while (!grid.percolates());
+			double pt = ((double) opened) / total;
+			//StdOut.println(String.format("opened %d perc.thresh. %f", opened, pt));
+			threshold[i] = pt;
 		}
+		mu = StdStats.mean(threshold);
+		sigma = StdStats.stddev(threshold); 
 	}
 
 	/**
@@ -31,7 +55,7 @@ public class PercolationStats {
 	 * @return
 	 */
 	public double mean() {
-		return 0;
+		return mu;
 	}
 
 	/**
@@ -39,7 +63,7 @@ public class PercolationStats {
 	 * @return sample standard deviation of percolation threshold
 	 */
 	public double stddev() {
-		return 0;
+		return sigma;
 	}
 
 	/**
@@ -47,7 +71,7 @@ public class PercolationStats {
 	 * @return returns lower bound of the 95% confidence interval
 	 */
 	public double confidenceLo() {
-		return 0;
+		return mu - 1.96 * sigma / Math.sqrt(T);
 	}
 
 	/**
@@ -55,7 +79,7 @@ public class PercolationStats {
 	 * @return upper bound of the 95% confidence interval
 	 */
 	public double confidenceHi() {
-		return 0;
+		return mu + 1.96 * sigma / Math.sqrt(T);
 	}
 
 	/**
@@ -75,8 +99,10 @@ public class PercolationStats {
 		}
 		int n = Integer.parseInt(args[0]);
 		int t = Integer.parseInt(args[1]);
-		
+		StdOut.println(String.format("PercolationStats - %d experiments of size %d", n, t));
+		Stopwatch timer = new Stopwatch();
 		PercolationStats stats = new PercolationStats(n, t);
+		StdOut.println(String.format("took: %.2f sec", timer.elapsedTime()) );
 		StdOut.println(String.format("mean: %f", stats.mean()) );
 		StdOut.println(String.format("stdev: %f", stats.stddev()) );
 		StdOut.println(String.format("confidence interval: [%f, %f]", stats.confidenceLo(), stats.confidenceHi()) );
