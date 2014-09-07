@@ -72,7 +72,10 @@ public class PercolationVisualizer {
         while (!in.isEmpty()) {
             int i = in.readInt();
             int j = in.readInt();
+            //StdOut.println("open " + i + " " + j);
             perc.open(i, j);
+            //StdOut.println("isFull(3,1) " +  perc.isFull(3,1));
+            //StdOut.println("isFull(1,3) " +  perc.isFull(1,3));
             draw(perc, N);
             StdDraw.show(DELAY);
         }
