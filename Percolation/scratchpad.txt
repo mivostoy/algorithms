@@ -1,3 +1,52 @@
+https://class.coursera.org/algs4partI-006/forum/thread?thread_id=91
+
+
+https://class.coursera.org/algs4partI-006/forum/thread?thread_id=91
+
+ * 
+ * "if one uses the suggested trick of adding dummy open rows at the top and
+ * bottom to make the test for percolation more efficient, one encounters the
+ * “backwash” problem mentioned in the checklist for the assignment: when
+ * percolation occurs, all components that contain an open cell in the bottom
+ * row are declared “full” (and will be visualized as such), because they are
+ * connected through the dummy bottom row to an actual full cell in the bottom
+ * row.
+ * 
+ * This is a symptom of a possibly more serious problem: the implementation does
+ * not actually keep track of all the connected components, since components
+ * with cells in the top row are combined, as are components with cells in the
+ * bottom row. This means that one cannot keep track of additional statistic,
+ * such as the number of components, or the size of the largest component.
+ * 
+ * Here is what I think is a better and more disciplined way to keep track of
+ * whether the system percolates. Store two bits with each component root. One
+ * of these bits is true if the component contains a cell in the top row. The
+ * other bit is true if the component contains a cell in the bottom row.
+ * Updating the bits after a union takes constant time. Percolation occurs when
+ * the component containing a newly opened cell has both bits true, after the
+ * unions that result from the cell becoming open. Unfortunately one must extend
+ * the union-find API to support such bits (or any other information associated
+ * with a set)."
+
+Here s how i did it with one UF
+1 . Created a top virtual node
+2. Create an array of size n * n to store extra information about the bottom row.
+
+
+Well, my way to solve the problem is to keep track, 
+for each connected component in the UF structure, 
+whether such connected component has at least one connection with the top 
+and the bottom of the grid.
+
+At this point, the system percolates if there exist at least one component 
+connected to both the top and the bottom.
+
+"isFull" is easily implemented, checking whether the connected component 
+can reach the top, and it does not suffer the backwash issue.
+
+I use the find method to get the id of the connected components in order 
+to keep this additional data consistent.
+
  import java.util.Arrays;
 
 public class Main {
