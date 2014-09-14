@@ -16,23 +16,21 @@ import java.util.Arrays;
  */
 public class Percolation {
     private static final int OPEN = 1;
-    private static final int CLOSED = 0;
+    // private static final int CLOSED = 0;
 
-    // union find object
-    private WeightedQuickUnionUF grid;
+    // union find objects
+    private WeightedQuickUnionUF topUF;
+    private WeightedQuickUnionUF botUF;
     // size of the grid
     private int size;
-    // 2-dimensional array with sites - includes extra top/bot rows and
-    // left/right cols
+    // 2-dimensional array with sites
     private int[][] site;
+    // true if percolating
+    private boolean isPercolating;
     // index of virtual top
     private int vtop;
-    private boolean isPercolating;
-    // true if a comp. is connected to bottom
-    private byte[] compInfo;
-
     // index of virtual bottom
-    // private int vbottom;
+    private int vbot;
 
     /**
      * Initialize our structure by creating N-by-N grid, with all sites blocked
@@ -46,24 +44,13 @@ public class Percolation {
         if (N < 1)
             throw new IllegalArgumentException();
         size = N;
-        // wil be init to 0 / false
+        // will be init to 0
         site = new int[N][N];
-        compInfo = new byte[N * N];
-        // Arrays.fill(site, CLOSED);
-        // Arrays.fill(compInfo, 0);
-        //
-        // for (int i = 0; i < N; i++) {
-        // for (int j = 0; j < N; j++) {
-        // // all closed initially
-        // site[i][j] = CLOSED;
-        // //botconn[i][j] = false;
-        // }
-        // }
-        // virtual top/bottom - middle col
         int size2 = size * size;
-        grid = new WeightedQuickUnionUF(size2 + 2);
+        topUF = new WeightedQuickUnionUF(size2 + 1);
+        botUF = new WeightedQuickUnionUF(size2 + 1);
         vtop = size2;
-        // vbot = size2 + 1;
+        vbot = size2;
     }
 
     private void checkBounds(int row, int col) {
@@ -90,91 +77,45 @@ public class Percolation {
         // open this site
         site[row - 1][col - 1] = OPEN;
         int idx = index(row, col);
-        StdOut.println("*** open " + row + " " + col);
-        // check all 4 sides
-        // top row?
-        int flag = 0;
+        // StdOut.println("*** open " + row + " " + col);
+        // check 2-4 sides
         if (row == 1) {
-            grid.union(vtop, idx);
-            flag |= compCheck(row, col);
+            // top row
+            topUF.union(vtop, idx);
         } else {
             if (isOpen(row - 1, col)) {
                 connect(row, col, row - 1, col);
-                flag |= compCheck(row - 1, col);
             }
         }
         if (row < size) {
             if (isOpen(row + 1, col)) {
                 connect(row, col, row + 1, col);
-                flag |= compCheck(row + 1, col);
             }
+        } else {
+            // bot row
+            botUF.union(vbot, idx);
         }
         if (col > 1) {
             if (isOpen(row, col - 1)) {
                 connect(row, col, row, col - 1);
-                flag |= compCheck(row, col - 1);
             }
         }
         if (col < size) {
             if (isOpen(row, col + 1)) {
                 connect(row, col, row, col + 1);
-                flag |= compCheck(row, col + 1);
             }
         }
-        flag |= compCheck(row, col);
-        StdOut.println("flag " + flag);
-        if (!isPercolating && flag == 3) {
+        if (!isPercolating && topUF.connected(vtop, idx)
+                && botUF.connected(vbot, idx)) {
             isPercolating = true;
-            StdOut.println("*** PERCOLATION, r " + row + ", c " + col);
         }
-
-    }
-
-    private int compCheck(int row, int col) {
-        int ret = 0;
-        int idx1 = index(row, col);
-        int comp1 = grid.find(idx1);
-        if (comp1 == vtop) {
-            compInfo[idx1] = 1; // full
-            ret = 1;
-        }
-
-        StdOut.println("compCheck " + row + ", " + col + " idx1 " + idx1
-                + " comp1 " + comp1 + ", info " + compInfo[idx1]);
-
-        if (comp1 < vtop) {
-            StdOut.println("info1 " + compInfo[idx1]);
-        }
-
-        int idx2 = index(size, col);
-        int comp2 = grid.find(idx2);
-
-//        StdOut.println("idx2 " + idx2 + ", comp2 " + comp2 + ", info "
-//                + compInfo[idx2]);
-
-        // if (grid.connected(comp2, idx1)) {
-        if (comp1 == comp2) {
-            compInfo[idx2] |= 2;
-            ret = ret + 2;
-            StdOut.println("== Connected to bottom idx1 " + idx1 + ", comp2 "
-                    + comp2 + ", info " + compInfo[idx1]);
-            //StdOut.println("Connected to top " + grid.connected(idx1, vtop));
-        }
-
-        // if (!isPercolating && compInfo[idx1] == 3) {
-        // isPercolating = true;
-        // StdOut.println("*** PERCOLATION, r " + row + ", c " + col +
-        // ", comp1 " + comp1 + " ***");
-        // }
-        return ret;
     }
 
     private void connect(int row1, int col1, int row2, int col2) {
         int idx1 = index(row1, col1);
         int idx2 = index(row2, col2);
-        // StdOut.println("connect " + row1 + ", " + col1 + " idx " + idx1 +
-        // " with " + row2 + ", " + col2 + " idx " + idx2);
-        grid.union(idx1, idx2);
+        topUF.union(idx1, idx2);
+        botUF.union(idx1, idx2);
     }
 
     /**
@@ -209,13 +150,7 @@ public class Percolation {
             return false;
         }
         int idx = index(row, col);
-        // int comp = grid.find(idx);
-        // StdOut.println("isFull? " + row + ", " + col +
-        // ", idx " + idx + ", comp " + comp + ", vtop " + vtop);
-        // return comp == vtop;
-        // return false;
-        return grid.connected(vtop, idx);
-        // return vtop == grid.find(idx);
+        return topUF.connected(vtop, idx);
     }
 
     /*
