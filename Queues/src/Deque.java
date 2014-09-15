@@ -14,8 +14,7 @@ import java.util.Iterator;
  * worst-case time and use space proportional to the number of items currently
  * in the deque. Additionally, your iterator implementation must support the
  * operations next() and hasNext() (plus construction) in constant worst-case
- * time and use a constant amount of extra space per iterator.
- * use linked list
+ * time and use a constant amount of extra space per iterator. use linked list
  * 
  * @author ivostoy
  * 
@@ -26,16 +25,17 @@ public class Deque<Item> implements Iterable<Item> {
     private Node head = null;
     private Node tail = null;
     private int len = 0;
-    
+
     private class Node {
         Item item;
         Node next;
         Node prev;
+
         Node(Item item) {
             this.item = item;
         }
     }
-    
+
     // construct an empty deque
     public Deque() {
     }
@@ -50,34 +50,40 @@ public class Deque<Item> implements Iterable<Item> {
         return len;
     }
 
-    // private void debug() {
-    // StdOut.print("[ ");
-    // if (head != null)
-    // StdOut.print(" head " + head.item);
-    // if (tail != null)
-    // StdOut.print(" tail " + tail.item);
-    // StdOut.print(" ] ");
-    // if (head != null) {
-    // for (Node n = head; n != null; n = n.next)
-    // StdOut.print(" " + n.item);
-    // }
-    // StdOut.println("");
-    // }
-    
+    private void debug() {
+        StdOut.print("[ ");
+        if (head != null)
+            StdOut.print(" head " + head.item);
+        if (tail != null)
+            StdOut.print(" tail " + tail.item);
+        StdOut.print(" ] ");
+        if (head != null) {
+            for (Node n = head; n != null; n = n.next)
+                StdOut.print(" " + n.item);
+        }
+        StdOut.print(" | ");
+        if (tail != null) {
+            for (Node n = tail; n != null; n = n.prev)
+                StdOut.print(" " + n.item);
+        }
+
+        StdOut.println("");
+    }
+
     // insert the item at the front
     public void addFirst(Item item) {
         if (item == null)
             throw new NullPointerException("input is null");
-        //StdOut.println("addFirst " + item);
+        // StdOut.println("addFirst " + item);
         Node n = new Node(item);
         n.next = head;
         head = n;
         if (isEmpty()) {
             tail = n;
         } else {
-            head.prev = n;
+            head.next.prev = n;
         }
-        //debug();
+        // debug();
         len++;
     }
 
@@ -85,7 +91,7 @@ public class Deque<Item> implements Iterable<Item> {
     public void addLast(Item item) {
         if (item == null)
             throw new NullPointerException("input is null");
-        //StdOut.println("addLast " + item);
+        // StdOut.println("addLast " + item);
         Node n = new Node(item);
         n.prev = tail;
         tail = n;
@@ -94,7 +100,7 @@ public class Deque<Item> implements Iterable<Item> {
         } else {
             tail.prev.next = n;
         }
-        //debug();
+        // debug();
         len++;
     }
 
@@ -103,15 +109,19 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty())
             throw new java.util.NoSuchElementException("Empty");
         Item item = head.item;
+        // StdOut.println("removeFirst " + item);
         // last elem?
         if (size() == 1) {
+            // deloiter
+            tail.item = null;
             tail = null;
         } else {
+            head.next.prev.item = null;
             head.next.prev = null;
         }
-        head = head.next;    
+        head = head.next;
         len--;
-        //debug();
+        // debug();
         return item;
     }
 
@@ -120,17 +130,20 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty())
             throw new java.util.NoSuchElementException("Empty");
         Item item = tail.item;
+        // StdOut.println("removeLast " + item);
+        // last elem?
         if (size() == 1) {
+            head.item = null;
             head = null;
         } else {
+            tail.prev.next.item = null;
             tail.prev.next = null;
         }
-        tail = tail.prev;    
+        tail = tail.prev;
         len--;
-        //debug();
+        // debug();
         return item;
     }
-    
 
     @Override
     public Iterator<Item> iterator() {
@@ -143,6 +156,7 @@ public class Deque<Item> implements Iterable<Item> {
 
     private class ListIterator implements Iterator<Item> {
         private Node current = head;
+
         @Override
         public boolean hasNext() {
             return current != null;

@@ -74,11 +74,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         for (int i = idx; i < mSize - 1; i++) {
             m[i] = m[i + 1];
         }
-        m[mSize-1] = null;
+        m[mSize - 1] = null;
         mSize--;
-        if (mSize > 0 && mSize == m.length/4) {
+        if (mSize > 0 && mSize == m.length / 4) {
             // shrink
-            resize(m.length/2);
+            resize(m.length / 2);
         }
         return item;
     }

@@ -28,18 +28,16 @@ public class Subset {
             return;
         
         RandomizedQueue<String> q = new RandomizedQueue<String>();
-        //int n = 0;
-        while (StdIn.hasNextLine()) {
-            String s = StdIn.readString();
-            // StdOut.println(s + " " + s.isEmpty());
-            if (s.equals("-"))
-                break;
-            q.enqueue(s);
+        
+        String [] words = StdIn.readAllStrings();
+        int n  = 0;
+        for (String w: words) {
+          q.enqueue(w);
+          n++;
+          if (n > k) {
+              q.dequeue();
+          }
         }
-//        if (n < k) {
-//            StdOut.println("need more strings than " + k + " - got " + n);
-//            return;
-//        }
 
         for (String s : q) {
             StdOut.println(s);

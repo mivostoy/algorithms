@@ -18,7 +18,7 @@ Test 3: Calls to addFirst() and removeLast()
  *
  */
 public class DequeTest {
-
+/**/
     @Test
     public void testAddFirst() {
         Deque<String> d = new Deque<String>();
@@ -86,7 +86,7 @@ public class DequeTest {
         s = d.removeFirst();
         assertEquals("foo", s);
     }
-
+/**/
     @Test
     public void testIterator() {
         Deque<String> d = new Deque<String>();
