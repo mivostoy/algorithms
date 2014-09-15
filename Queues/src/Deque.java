@@ -50,18 +50,25 @@ public class Deque<Item> implements Iterable<Item> {
         return len;
     }
 
-    void debug() {
-        StdOut.print("[ ");
-        if (head != null) 
-            StdOut.print(" head " + head.item);
-        if (tail != null)
-            StdOut.print(" tail " + tail.item);
-        StdOut.println(" ]");
-    }
+    // private void debug() {
+    // StdOut.print("[ ");
+    // if (head != null)
+    // StdOut.print(" head " + head.item);
+    // if (tail != null)
+    // StdOut.print(" tail " + tail.item);
+    // StdOut.print(" ] ");
+    // if (head != null) {
+    // for (Node n = head; n != null; n = n.next)
+    // StdOut.print(" " + n.item);
+    // }
+    // StdOut.println("");
+    // }
+    
     // insert the item at the front
     public void addFirst(Item item) {
         if (item == null)
             throw new NullPointerException("input is null");
+        //StdOut.println("addFirst " + item);
         Node n = new Node(item);
         n.next = head;
         head = n;
@@ -70,6 +77,7 @@ public class Deque<Item> implements Iterable<Item> {
         } else {
             head.prev = n;
         }
+        //debug();
         len++;
     }
 
@@ -77,14 +85,16 @@ public class Deque<Item> implements Iterable<Item> {
     public void addLast(Item item) {
         if (item == null)
             throw new NullPointerException("input is null");
+        //StdOut.println("addLast " + item);
         Node n = new Node(item);
         n.prev = tail;
         tail = n;
         if (isEmpty()) {
             head = n;
         } else {
-            head.next = n;
+            tail.prev.next = n;
         }
+        //debug();
         len++;
     }
 
@@ -101,6 +111,7 @@ public class Deque<Item> implements Iterable<Item> {
         }
         head = head.next;    
         len--;
+        //debug();
         return item;
     }
 
@@ -116,18 +127,41 @@ public class Deque<Item> implements Iterable<Item> {
         }
         tail = tail.prev;    
         len--;
+        //debug();
         return item;
     }
     
 
     @Override
     public Iterator<Item> iterator() {
-        return null;
+        return new ListIterator();
     }
 
     // unit testing
     public static void main(String[] args) {
     }
 
+    private class ListIterator implements Iterator<Item> {
+        private Node current = head;
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        @Override
+        public Item next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException("no next");
+            }
+            Item item = current.item;
+            current = current.next;
+            return item;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
 
 }
