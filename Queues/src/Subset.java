@@ -11,8 +11,9 @@
  * use only a constant amount of memory plus either one Deque or RandomizedQueue
  * object of maximum size at most N, where N is the number of strings on
  * standard input. (For an extra challenge, use only one Deque or
- * RandomizedQueue object of maximum size at most k.)
- * zip Queues.zip Deque.java RandomizedQueue.java Subset.java
+ * RandomizedQueue object of maximum size at most k.) zip Queues.zip Deque.java
+ * RandomizedQueue.java Subset.java
+ * 
  * @author ivostoy
  * 
  */
@@ -24,19 +25,20 @@ public class Subset {
             return;
         }
         int k = Integer.parseInt(args[0]);
-        if (k <= 0) 
+        if (k <= 0)
             return;
-        
+
         RandomizedQueue<String> q = new RandomizedQueue<String>();
-        
-        String [] words = StdIn.readAllStrings();
-        int n  = 0;
-        for (String w: words) {
-          q.enqueue(w);
-          n++;
-          if (n > k) {
-              q.dequeue();
-          }
+
+        String[] words = StdIn.readAllStrings();
+        // int n = 0;
+        for (String w : words) {
+            q.enqueue(w);
+            // n++;
+            // if (n > k) {
+            // q.dequeue();
+            // n--;
+            // }
         }
 
         for (String s : q) {
