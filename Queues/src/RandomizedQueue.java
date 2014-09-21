@@ -62,6 +62,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         mSize++;
     }
 
+    private void swap(int i, int j) {
+        Item copy = m[i];
+        m[i] = m[j];
+        m[j] = copy;
+    }
+
     // delete and return a random item
     public Item dequeue() {
         if (isEmpty())
@@ -70,12 +76,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item item = m[idx];
         // don't loiter
         m[idx] = null;
-        // shift left
-        for (int i = idx; i < mSize - 1; i++) {
-            m[i] = m[i + 1];
-        }
-        m[mSize - 1] = null;
+        // swap with last and reduce size
         mSize--;
+        swap(idx, mSize);
         if (mSize > 0 && mSize == m.length / 4) {
             // shrink
             resize(m.length / 2);
@@ -110,18 +113,19 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             for (int i = 0; i < mSize; i++) {
                 s[i] = m[i];
             }
-            // shuffle
-            for (int i = 0; i < mSize; i++) {
-                int ridx = StdRandom.uniform(i + 1);
-                if (i == ridx)
-                    continue;
-                // swap with random index
-                // StdOut.println("i " + i + ", ridx " + ridx +
-                // " : swap " + s[i] + " and " + s[ridx]);
-                Item item = s[i];
-                s[i] = s[ridx];
-                s[ridx] = item;
-            }
+            StdRandom.shuffle(s);
+            // // shuffle
+            // for (int i = 0; i < mSize; i++) {
+            // int ridx = StdRandom.uniform(i + 1);
+            // if (i == ridx)
+            // continue;
+            // // swap with random index
+            // // StdOut.println("i " + i + ", ridx " + ridx +
+            // // " : swap " + s[i] + " and " + s[ridx]);
+            // Item item = s[i];
+            // s[i] = s[ridx];
+            // s[ridx] = item;
+            // }
         }
 
         @Override
