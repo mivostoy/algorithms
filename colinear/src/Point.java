@@ -1,3 +1,8 @@
+/**
+ * 
+ * https://class.coursera.org/algs4partI-006/assignment/view?assignment_id=4
+ * 
+ */
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
@@ -66,7 +71,7 @@ public class Point implements Comparable<Point> {
             }
             return Double.POSITIVE_INFINITY;
         }
-        return dy / dx;
+        return (double) dy / (double) dx;
 
     }
 

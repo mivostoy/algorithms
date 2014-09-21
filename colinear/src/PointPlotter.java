@@ -36,4 +36,30 @@ public class PointPlotter {
         // reset the pen radius
         StdDraw.setPenRadius();
     }
+    
+    public static void plot(Point[] points) {
+        // rescale coordinates and turn on animation mode
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        StdDraw.show(0);
+        StdDraw.setPenRadius(0.01);  // make the points a bit larger
+
+        for (Point p: points) {
+            p.draw();
+        }
+
+        // display to screen all at once
+        StdDraw.show(0);
+
+        // reset the pen radius
+        StdDraw.setPenRadius();
+    }
+    
+//    public static void segment(Point p, Point q, Point r, Point s) {
+//
+//        StdDraw.setPenColor(StdDraw.BLUE);
+//        StdDraw.line(p.g, p.y, q.x, q.y);
+//    }
+    
+    
 }
