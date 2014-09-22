@@ -10,43 +10,43 @@ public class Point implements Comparable<Point> {
     // compare points by slope
     public final Comparator<Point> SLOPE_ORDER = new SlopeComparator();
     private static final double eps = 0.0001;
+    private static final double POSITIVE_ZERO = (1.0 - 1.0) / 1.0;
 
     private class SlopeComparator implements Comparator<Point> {
-//        private final int x; // x coordinate
-//        private final int y; // y coordinate
-//        
-//        public SlopeComparator(int x, int y) {
-//            this.x = x;
-//            this.y = y;
-//        }
-        
+
         @Override
         // the point (x1, y1) is less than the point (x2, y2) if and only if the
-        // slope (y1 − y0) / (x1 − x0) is less than the slope (y2 − y0) / (x2 − x0).
+        // slope (y1 − y0) / (x1 − x0) is less than the slope (y2 − y0) / (x2 −
+        // x0).
         // Treat horizontal, vertical, and degenerate line segments as in the
         // slopeTo() method
-        // Returns a negative integer, zero, or a positive integer as this object is
+        // Returns a negative integer, zero, or a positive integer as this
+        // object is
         // less than, equal to, or greater than the specified object.
         public int compare(Point p1, Point p2) {
-            double s1 = p1.slopeTo(Point.this); 
+            double s1 = p1.slopeTo(Point.this);
             double s2 = p2.slopeTo(Point.this);
-            double d = s1 - s2;
+            //StdOut.println("d1 " + s1 + " d2 " + s2);
+            if (Double.isInfinite(s1) && Double.isInfinite(s2))
+                return 0;
+            double d = s1-s2;
+            //StdOut.println("d1 " + s1 + " d2 " + s2 + " delta " + d);
             if (Math.abs(d) < eps)
                 return 0;
             return d < 0 ? -1 : 1;
         }
     }
-    
+
     private final int x; // x coordinate
     private final int y; // y coordinate
-    //private final Point p0;
-    
+
+    // private final Point p0;
+
     // create the point (x, y)
     public Point(int x, int y) {
         /* DO NOT MODIFY */
         this.x = x;
         this.y = y;
-        //this.p0 = new Point(x,y);
     }
 
     // plot this point to standard drawing
@@ -62,15 +62,27 @@ public class Point implements Comparable<Point> {
     }
 
     // slope between this point and that point
+    /**
+     * What does it mean for slopeTo() to return positive zero? Java (and the
+     * IEEE 754 floating-point standard) define two representations of zero:
+     * negative zero and positive zero.
+     * 
+     * double a = 1.0; double x = (a - a) / a; // positive zero ( 0.0) double y
+     * = (a - a) / -a; // negative zero (-0.0)
+     */
     public double slopeTo(Point that) {
         int dx = that.x - x;
         int dy = that.y - y;
         if (dx == 0) {
             if (dy == 0) {
+                // same point
                 return Double.NEGATIVE_INFINITY;
             }
+            // vertical
             return Double.POSITIVE_INFINITY;
         }
+        if (dy == 0)
+            return POSITIVE_ZERO;
         return (double) dy / (double) dx;
 
     }
