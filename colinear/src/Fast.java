@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 public class Fast {
 
-    private static final double eps = 0.0000001;
+    private static final double eps = 1e-10;
 
     private static boolean equal(double a, double b) {
         if (Math.abs(a - b) < eps || 
@@ -66,7 +66,7 @@ public class Fast {
             points[i].draw();
         }
 
-        Arrays.sort(points);
+        Quick.sort(points);
 //        for (int i = 0; i < N; i++) {
 //            StdOut.println(points[i] + " ");
 //            points[i].draw();
@@ -78,8 +78,8 @@ public class Fast {
 
         for (int i = 0; i < N; i++) {
             Point p = points[i];
-            //StdOut.println("--- " + i + ", p " + p);
-            //StdOut.println("p " + p);
+            StdOut.println("--- " + i + ", p " + p);
+            StdOut.println("p " + p);
             // make a copy of points to the right
             int n = N - i - 1;
             if (n < 3) {
@@ -95,22 +95,22 @@ public class Fast {
             // sort points i+1..N using slope comparator
             Arrays.sort(pts, 0, n, p.SLOPE_ORDER);
 
-//            for (int j = 0; j < n; j++ ) {
-//                Point q = pts[j];
-//                double slope_pq = p.slopeTo(q);
-//                StdOut.println(String.format("j %d, q %s, slope %f", j, q, slope_pq));
-//            }
+            for (int j = 0; j < n; j++ ) {
+                Point q = pts[j];
+                double slope_pq = p.slopeTo(q);
+                StdOut.println(String.format("SORTED j %d, q %s, slope %f", j, q, slope_pq));
+            }
             
             for (int j = 0; j < n - 1; j++ ) {
                 Point q = pts[j];
                 double slope_pq = p.slopeTo(q);
-                //StdOut.println(String.format("j %d, q %s, slope %f", j, q, slope_pq));
+                StdOut.println(String.format("j %d, q %s, slope %f", j, q, slope_pq));
                 int count = 0;
                 Point last = null;
                 String outp = p + " -> " + q;
                 for (int k = j + 1; k < n; k++ ) {
-                    //StdOut.println(String.format("k %d, r %s, slope %f, count %d", 
-                    //        k, pts[k], p.slopeTo(pts[k]), count));
+                    StdOut.println(String.format("k %d, r %s, slope %f, count %d", 
+                            k, pts[k], p.slopeTo(pts[k]), count));
                     if (equal(p.slopeTo(pts[k]), slope_pq)) {
                         count++; // count equal
                         last = pts[k];

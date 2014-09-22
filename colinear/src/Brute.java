@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 public class Brute {
 
-    private static final double eps = 0.0000001;
+    private static final double eps = 1e-10;
 
     private static boolean equal(double a, double b) {
         if (Math.abs(a - b) < eps || 

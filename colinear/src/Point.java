@@ -9,7 +9,7 @@ public class Point implements Comparable<Point> {
 
     // compare points by slope
     public final Comparator<Point> SLOPE_ORDER = new SlopeComparator();
-    private static final double eps = 0.0001;
+    private static final double eps = 1e-10;
     private static final double POSITIVE_ZERO = (1.0 - 1.0) / 1.0;
 
     private class SlopeComparator implements Comparator<Point> {
@@ -24,11 +24,20 @@ public class Point implements Comparable<Point> {
         // object is
         // less than, equal to, or greater than the specified object.
         public int compare(Point p1, Point p2) {
+            if (p1 == null || p2 == null) 
+                throw new NullPointerException();
+            
             double s1 = p1.slopeTo(Point.this);
             double s2 = p2.slopeTo(Point.this);
-            //StdOut.println("d1 " + s1 + " d2 " + s2);
-            if (Double.isInfinite(s1) && Double.isInfinite(s2))
+            if (Double.isInfinite(s1) && Double.isInfinite(s2)) {
+                //StdOut.println("s1 " + s1 + " s2 " + s2);
+                if (s1 < s2)
+                    return -1;
+                if (s1 > s2)
+                    return 1;
                 return 0;
+            }
+            
             double d = s1-s2;
             //StdOut.println("d1 " + s1 + " d2 " + s2 + " delta " + d);
             if (Math.abs(d) < eps)
