@@ -51,7 +51,7 @@ public class Fast {
         String filename = args[0];
         In in = new In(filename);
         int N = in.readInt();
-        //StdOut.println("FAST File " + filename + ", " + N + " points");
+        // StdOut.println("FAST File " + filename + ", " + N + " points");
         if (N < 4)
             return;
 
@@ -68,7 +68,7 @@ public class Fast {
         Arrays.sort(points);
         // Quick.sort(points);
         for (int i = 0; i < N; i++) {
-            //StdOut.println(points[i] + " ");
+            // StdOut.println(points[i] + " ");
             points[i].draw();
         }
 
@@ -78,61 +78,82 @@ public class Fast {
         int found = 0;
         for (int i = 0; i < N - 1; i++) {
             Point p = points[i];
-            //StdOut.println("--- " + i + ", p " + p);
             // make a copy of points to the right
             int n = N - i - 1;
-            if (n < 3) {
-                break;
-            }
-            //StdOut.println("=== " + n);
+//            if (n < 3) {
+//                break;
+//            }
+            StdOut.println("--- i " + i + ", p " + p + ", n " + n);
             Point pts[] = new Point[n];
             for (int j = 0; j < n; j++) {
                 pts[j] = points[i + j + 1];
-                //StdOut.println(pts[j]);
+                // StdOut.println(pts[j]);
             }
-
             // sort points i..N using slope comparator
             Arrays.sort(pts, 0, n, p.SLOPE_ORDER);
-            // Merge.sort(pts);
-            // for (int j = 0; j < n; j++ ) {
-            // Point q = pts[j];
-            // double slope_pq = p.slopeTo(q);
-            // StdOut.println(String.format("SORTED j %d, q %s, slope %f", j, q,
-            // slope_pq));
-            // }
             for (int j = 0; j < n; j++) {
                 Point q = pts[j];
                 double slope_pq = p.slopeTo(q);
-                //StdOut.println(String.format("j %d, q %s, slope %f", j, q,
-                //        slope_pq));
+                StdOut.println(String.format("SORTED j %d, q %s, slope %f", j,
+                        q, slope_pq));
+            }
+            for (int j = 0; j < n; j++) {
+                Point q = pts[j];
+                double slopePQ = p.slopeTo(q);
+                //StdOut.println(String.format("i %d, j %d, q %s, slope %f", i, j, q,
+                //        slopePQ));
                 int count = 0;
                 // max 10 collinear
                 Point coll[] = new Point[10];
                 coll[0] = p;
                 coll[1] = q;
                 for (int k = j + 1; k < n; k++) {
-                    //StdOut.println(String.format(
-                    //        "k %d, r %s, slope %f, count %d", k, pts[k],
-                    //        p.slopeTo(pts[k]), count));
-                    if (equal(p.slopeTo(pts[k]), slope_pq)) {
+                    // StdOut.println(String.format(
+                    // "k %d, r %s, slope %f, count %d", k, pts[k],
+                    // p.slopeTo(pts[k]), count));
+                    if (equal(p.slopeTo(pts[k]), slopePQ)) {
                         coll[count + 2] = pts[k];
                         count++; // count equal
+                        StdOut.println(String.format(
+                                "k %d, r %s, slope %f, count %d", k, pts[k],
+                                p.slopeTo(pts[k]), count));
                     } else {
                         break;
                     }
                 }
                 if (count >= 2) {
+                    StdOut.println(String.format("j %d count %d, PQ %f", j, count,
+                           slopePQ));
+                    /**
+                     * Given a point p you can find a set of points {p1, p2 ...
+                     * pn} which are collinear with p and which occur in the
+                     * list after p. But is this set a subset of something
+                     * you've already printed? It is if and only if there is a
+                     * point p0, which is before p, and which is collinear with
+                     * p1...pn.
+                     * 
+                     * In other words, you can check if there is a point before
+                     * p, with the same slope with it as p1...pn. This can even
+                     * be done with logarithmic complexity.
+                     */
+                    for (int s = 0; s < j - 1; s++) {
+                        StdOut.println("check " + p.slopeTo(pts[s]));
+                        if (equal(p.slopeTo(pts[s]), slopePQ)) {
+                            StdOut.println("ALREADY PRINTED " + pts[s]);
+                        }
+                    }
+                    count += 2;
                     found++;
-                    display(coll, count + 2);
-                    j += count - 1;
-                    i += count - 2;
-                    //StdOut.println(String.format("i %d j %d", i, j));
+                    display(coll, count);
+                    //j += count - 3;
+                    //i += count - 4;
+                    StdOut.println(String.format("count %d, i %d, j %d", count,
+                            i, j));
                 }
             }
-
         }
         StdDraw.show(0);
-        //StdOut.println("found " + found);
+        StdOut.println("found " + found);
     }
 
     private static void display(Point[] coll, int l) {
