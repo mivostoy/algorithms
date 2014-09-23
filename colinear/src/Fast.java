@@ -83,25 +83,26 @@ public class Fast {
 //            if (n < 3) {
 //                break;
 //            }
-            StdOut.println("--- i " + i + ", p " + p + ", n " + n);
+            StdOut.println("--- i " + i + ", P " + p + ", n " + n);
             Point pts[] = new Point[n];
             for (int j = 0; j < n; j++) {
                 pts[j] = points[i + j + 1];
                 // StdOut.println(pts[j]);
             }
             // sort points i..N using slope comparator
+            StdOut.println("Sorting " + n);
             Arrays.sort(pts, 0, n, p.SLOPE_ORDER);
-            for (int j = 0; j < n; j++) {
-                Point q = pts[j];
-                double slope_pq = p.slopeTo(q);
-                StdOut.println(String.format("SORTED j %d, q %s, slope %f", j,
-                        q, slope_pq));
-            }
+//            for (int j = 0; j < n; j++) {
+//                Point q = pts[j];
+//                double slope_pq = p.slopeTo(q);
+//                StdOut.println(String.format("SORTED j %d, q %s, slope %f", j,
+//                        q, slope_pq));
+//            }
             for (int j = 0; j < n; j++) {
                 Point q = pts[j];
                 double slopePQ = p.slopeTo(q);
-                //StdOut.println(String.format("i %d, j %d, q %s, slope %f", i, j, q,
-                //        slopePQ));
+                StdOut.println(String.format("i %d, j %d, Q %s, slope %f", i, j, q,
+                        slopePQ));
                 int count = 0;
                 // max 10 collinear
                 Point coll[] = new Point[10];
@@ -114,9 +115,9 @@ public class Fast {
                     if (equal(p.slopeTo(pts[k]), slopePQ)) {
                         coll[count + 2] = pts[k];
                         count++; // count equal
-                        StdOut.println(String.format(
-                                "k %d, r %s, slope %f, count %d", k, pts[k],
-                                p.slopeTo(pts[k]), count));
+//                        StdOut.println(String.format(
+//                                "k %d, r %s, slope %f, count %d", k, pts[k],
+//                                p.slopeTo(pts[k]), count));
                     } else {
                         break;
                     }
@@ -136,19 +137,22 @@ public class Fast {
                      * p, with the same slope with it as p1...pn. This can even
                      * be done with logarithmic complexity.
                      */
-                    for (int s = 0; s < j - 1; s++) {
+                    for (int s = 0; s < j; s++) {
                         StdOut.println("check " + p.slopeTo(pts[s]));
                         if (equal(p.slopeTo(pts[s]), slopePQ)) {
-                            StdOut.println("ALREADY PRINTED " + pts[s]);
+                            StdOut.println("**** ALREADY PRINTED " + pts[s]);
+                            count = 0;
                         }
                     }
-                    count += 2;
-                    found++;
-                    display(coll, count);
-                    //j += count - 3;
-                    //i += count - 4;
-                    StdOut.println(String.format("count %d, i %d, j %d", count,
-                            i, j));
+                    if (count > 0) {
+                        //count += 2;
+                        found++;
+                        display(coll, count + 2);
+                        //j += count - 3;
+                        //i += count - 4;
+                        //StdOut.println(String.format("count %d, i %d, j %d", count,
+                        //        i, j));
+                    }
                 }
             }
         }
@@ -157,7 +161,7 @@ public class Fast {
     }
 
     private static void display(Point[] coll, int l) {
-        Arrays.sort(coll, 0, l);
+        //Arrays.sort(coll, 0, l);
         coll[0].drawTo(coll[l - 1]);
         StdOut.print(coll[0]);
         for (int i = 1; i < l; i++) {
