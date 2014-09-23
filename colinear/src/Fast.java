@@ -29,12 +29,12 @@ public class Fast {
     private static final double eps = 1e-10;
 
     private static boolean equal(double a, double b) {
-        if (Math.abs(a - b) < eps || 
-                (Double.isInfinite(a) && Double.isInfinite(b)) ) {
-            //StdOut.println(String.format("equal %f %f - TRUE", a, b));
+        if (Math.abs(a - b) < eps
+                || (Double.isInfinite(a) && Double.isInfinite(b))) {
+            // StdOut.println(String.format("equal %f %f - TRUE", a, b));
             return true;
         }
-        //StdOut.println(String.format("equal %f %f - FALSE", a, b));
+        // StdOut.println(String.format("equal %f %f - FALSE", a, b));
         return false;
     }
 
@@ -62,72 +62,86 @@ public class Fast {
             int x = in.readInt();
             int y = in.readInt();
             points[i] = new Point(x, y);
+            // StdOut.println(points[i] + " ");
+            points[i].draw();
+        }
+        Arrays.sort(points);
+        // Quick.sort(points);
+        for (int i = 0; i < N; i++) {
             //StdOut.println(points[i] + " ");
             points[i].draw();
         }
 
-        Quick.sort(points);
-//        for (int i = 0; i < N; i++) {
-//            StdOut.println(points[i] + " ");
-//            points[i].draw();
-//        }
-
         // reset the pen radius
         StdDraw.setPenRadius();
         StdDraw.setPenColor(StdDraw.BLUE);
-
-        for (int i = 0; i < N; i++) {
+        int found = 0;
+        for (int i = 0; i < N - 1; i++) {
             Point p = points[i];
-            StdOut.println("--- " + i + ", p " + p);
-            StdOut.println("p " + p);
+            //StdOut.println("--- " + i + ", p " + p);
             // make a copy of points to the right
             int n = N - i - 1;
             if (n < 3) {
                 break;
             }
             //StdOut.println("=== " + n);
-            Point pts [] = new Point[n];
+            Point pts[] = new Point[n];
             for (int j = 0; j < n; j++) {
-                pts[j] = points[i+j+1];
+                pts[j] = points[i + j + 1];
                 //StdOut.println(pts[j]);
             }
- 
-            // sort points i+1..N using slope comparator
-            Arrays.sort(pts, 0, n, p.SLOPE_ORDER);
 
-            for (int j = 0; j < n; j++ ) {
+            // sort points i..N using slope comparator
+            Arrays.sort(pts, 0, n, p.SLOPE_ORDER);
+            // Merge.sort(pts);
+            // for (int j = 0; j < n; j++ ) {
+            // Point q = pts[j];
+            // double slope_pq = p.slopeTo(q);
+            // StdOut.println(String.format("SORTED j %d, q %s, slope %f", j, q,
+            // slope_pq));
+            // }
+            for (int j = 0; j < n; j++) {
                 Point q = pts[j];
                 double slope_pq = p.slopeTo(q);
-                StdOut.println(String.format("SORTED j %d, q %s, slope %f", j, q, slope_pq));
-            }
-            
-            for (int j = 0; j < n - 1; j++ ) {
-                Point q = pts[j];
-                double slope_pq = p.slopeTo(q);
-                StdOut.println(String.format("j %d, q %s, slope %f", j, q, slope_pq));
+                //StdOut.println(String.format("j %d, q %s, slope %f", j, q,
+                //        slope_pq));
                 int count = 0;
-                Point last = null;
-                String outp = p + " -> " + q;
-                for (int k = j + 1; k < n; k++ ) {
-                    StdOut.println(String.format("k %d, r %s, slope %f, count %d", 
-                            k, pts[k], p.slopeTo(pts[k]), count));
+                // max 10 collinear
+                Point coll[] = new Point[10];
+                coll[0] = p;
+                coll[1] = q;
+                for (int k = j + 1; k < n; k++) {
+                    //StdOut.println(String.format(
+                    //        "k %d, r %s, slope %f, count %d", k, pts[k],
+                    //        p.slopeTo(pts[k]), count));
                     if (equal(p.slopeTo(pts[k]), slope_pq)) {
+                        coll[count + 2] = pts[k];
                         count++; // count equal
-                        last = pts[k];
-                        outp += " -> " + last;
                     } else {
                         break;
                     }
                 }
                 if (count >= 2) {
-                    p.drawTo(last);
-                    StdOut.println(outp);
+                    found++;
+                    display(coll, count + 2);
                     j += count - 1;
-                    i += count - 1;
+                    i += count - 2;
+                    //StdOut.println(String.format("i %d j %d", i, j));
                 }
             }
-            
+
         }
         StdDraw.show(0);
+        //StdOut.println("found " + found);
+    }
+
+    private static void display(Point[] coll, int l) {
+        Arrays.sort(coll, 0, l);
+        coll[0].drawTo(coll[l - 1]);
+        StdOut.print(coll[0]);
+        for (int i = 1; i < l; i++) {
+            StdOut.print(" -> " + coll[i]);
+        }
+        StdOut.println("");
     }
 }
