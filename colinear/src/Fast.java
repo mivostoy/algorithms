@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -26,17 +27,17 @@ import java.util.Arrays;
 
 public class Fast {
 
-    private static final double eps = 1e-10;
+    //private static final double eps = 1e-10;
 
-    private static boolean equal(double a, double b) {
-        if (Math.abs(a - b) < eps
-                || (Double.isInfinite(a) && Double.isInfinite(b))) {
-            // StdOut.println(String.format("equal %f %f - TRUE", a, b));
-            return true;
-        }
-        // StdOut.println(String.format("equal %f %f - FALSE", a, b));
-        return false;
-    }
+//    private static boolean equal(double a, double b) {
+//        if (Math.abs(a - b) < eps
+//                || (Double.isInfinite(a) && Double.isInfinite(b))) {
+//            // StdOut.println(String.format("equal %f %f - TRUE", a, b));
+//            return true;
+//        }
+//        // StdOut.println(String.format("equal %f %f - FALSE", a, b));
+//        return false;
+//    }
 
     private static void initPlot() {
         // rescale coordinates and turn on animation mode
@@ -49,6 +50,7 @@ public class Fast {
     public static void main(String[] args) {
         // read in the input
         String filename = args[0];
+        ArrayList<String> found_seg = new ArrayList<String>();
         In in = new In(filename);
         int N = in.readInt();
         // StdOut.println("FAST File " + filename + ", " + N + " points");
@@ -69,12 +71,15 @@ public class Fast {
         StdDraw.setPenRadius();
         StdDraw.setPenColor(StdDraw.BLUE);
 
+        // initial sort
+        Arrays.sort(points);
+        
         int found = 0;
         for (int i = 0; i < N; i++) {
             // make a copy and swap point i at first position
             Point pts[] = points.clone();
             Point p = pts[i];
-            //StdOut.println(String.format("=== P %s", p));
+            //StdOut.println(String.format("=== P %s i %d", p, i));
             pts[i] = pts[0];
             pts[0] = p;
             // sort points 1..N using slope comparator with p
@@ -82,11 +87,11 @@ public class Fast {
             for (int j = 1; j < N; j++) {
                 Point q = pts[j];
                 // if q < p - skip (order rule)
-                if (q.compareTo(p) < 0) {
+                if (q.compareTo(p) <= 0) {
                     continue;
                 }
                 double s = p.slopeTo(q);
-                // StdOut.println(String.format("    Q %s %f j %d", q, s, j));
+                //StdOut.println(String.format("    Q %s %f j %d", q, s, j));
                 // find runs of size 3+
                 int rlen = 0;
                 for (int k = j + 1; k < N; k++) {
@@ -97,14 +102,13 @@ public class Fast {
                     // StdOut.println(String.format("   k %d %f", k,
                     // p.slopeTo(pts[k])));
                     // skip if p is not lexicographically first in the run
-                    if (r.compareTo(p) < 0) {
+                    if (r.compareTo(p) <= 0) {
                         rlen = 0;
                         break;
                     }
                     rlen++;
                 }
                 if (rlen >= 2) {
-                    found++;
                     rlen += 2;
                     Point coll[] = new Point[rlen];
                     // copy, sort and display found set
@@ -115,13 +119,30 @@ public class Fast {
                         coll[x] = pts[m];
                         m++;
                     }
+                    Arrays.sort(coll);
+                    String seg = segment(coll);
                     // jump to point after the run (-1)
                     j = m - 1;
-                    Arrays.sort(coll);
-                    display(coll);
-                    // p.drawTo(pts[j]);
-                    // StdOut.println(String.format("  FOUND run with size %d, PQ %f, next j %d",
-                    // rlen+2, s, j));
+                    // check for sub-segment
+                    for (int x=0; x<found_seg.size(); x++) {
+                        if (found_seg.get(x).contains(seg)) {
+                            rlen = 0;
+                            break;
+                        }
+                    }
+                    // subseq?
+                    if (rlen == 0) {
+                        //StdOut.println("SKIP " + seg);
+                        continue;
+                    }
+                    // draw line first->last - will contain all points
+                    coll[0].drawTo(coll[coll.length - 1]);
+                    StdOut.println(seg);
+                    found_seg.add(seg);
+                    found++;
+                    //display(coll);
+                    //StdOut.println(String.format("  FOUND run %d with size %d, PQ %f, next j %d",
+                    //        found, rlen, s, j));
                 }
             }
         }
@@ -129,13 +150,23 @@ public class Fast {
         //StdOut.println("found " + found);
     }
 
-    private static void display(Point[] coll) {
-        int l = coll.length;
-        coll[0].drawTo(coll[l - 1]);
-        StdOut.print(coll[0]);
-        for (int i = 1; i < l; i++) {
-            StdOut.print(" -> " + coll[i]);
+    private static String segment(Point[] coll) {
+        StringBuffer seq = new StringBuffer();
+        seq.append(coll[0]);
+        for (int i = 1; i < coll.length; i++) {
+            seq.append(" -> " + coll[i]);
         }
-        StdOut.println("");
+        return seq.toString();
     }
+  
+//    private static void display(String seg, Point[] coll) {
+//        int l = coll.length;
+//        coll[0].drawTo(coll[l - 1]);
+//        StdOut.print(coll[0]);
+//        for (int i = 1; i < l; i++) {
+//            seq.append(" -> " + coll[i]);
+//        }
+//        StdOut.println(seq);
+//        sfound.add(seq.toString());
+//    }
 }

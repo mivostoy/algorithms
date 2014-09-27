@@ -93,6 +93,6 @@ public class Brute {
             }
         }
         StdDraw.show(0);
-        // StdOut.println("found " + found);
+        //StdOut.println("found " + found);
     }
 }
