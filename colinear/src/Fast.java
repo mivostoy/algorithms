@@ -62,106 +62,75 @@ public class Fast {
             int x = in.readInt();
             int y = in.readInt();
             points[i] = new Point(x, y);
-            // StdOut.println(points[i] + " ");
-            points[i].draw();
-        }
-        Arrays.sort(points);
-        // Quick.sort(points);
-        for (int i = 0; i < N; i++) {
-            // StdOut.println(points[i] + " ");
             points[i].draw();
         }
 
         // reset the pen radius
         StdDraw.setPenRadius();
         StdDraw.setPenColor(StdDraw.BLUE);
+
         int found = 0;
-        for (int i = 0; i < N - 1; i++) {
-            Point p = points[i];
-            // make a copy of points to the right
-            int n = N - i - 1;
-//            if (n < 3) {
-//                break;
-//            }
-            StdOut.println("--- i " + i + ", P " + p + ", n " + n);
-            Point pts[] = new Point[n];
-            for (int j = 0; j < n; j++) {
-                pts[j] = points[i + j + 1];
-                // StdOut.println(pts[j]);
-            }
-            // sort points i..N using slope comparator
-            StdOut.println("Sorting " + n);
-            Arrays.sort(pts, 0, n, p.SLOPE_ORDER);
-//            for (int j = 0; j < n; j++) {
-//                Point q = pts[j];
-//                double slope_pq = p.slopeTo(q);
-//                StdOut.println(String.format("SORTED j %d, q %s, slope %f", j,
-//                        q, slope_pq));
-//            }
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < N; i++) {
+            // make a copy and swap point i at first position
+            Point pts[] = points.clone();
+            Point p = pts[i];
+            //StdOut.println(String.format("=== P %s", p));
+            pts[i] = pts[0];
+            pts[0] = p;
+            // sort points 1..N using slope comparator with p
+            Arrays.sort(pts, 0, N, p.SLOPE_ORDER);
+            for (int j = 1; j < N; j++) {
                 Point q = pts[j];
-                double slopePQ = p.slopeTo(q);
-                StdOut.println(String.format("i %d, j %d, Q %s, slope %f", i, j, q,
-                        slopePQ));
-                int count = 0;
-                // max 10 collinear
-                Point coll[] = new Point[10];
-                coll[0] = p;
-                coll[1] = q;
-                for (int k = j + 1; k < n; k++) {
-                    // StdOut.println(String.format(
-                    // "k %d, r %s, slope %f, count %d", k, pts[k],
-                    // p.slopeTo(pts[k]), count));
-                    if (equal(p.slopeTo(pts[k]), slopePQ)) {
-                        coll[count + 2] = pts[k];
-                        count++; // count equal
-//                        StdOut.println(String.format(
-//                                "k %d, r %s, slope %f, count %d", k, pts[k],
-//                                p.slopeTo(pts[k]), count));
-                    } else {
+                // if q < p - skip (order rule)
+                if (q.compareTo(p) < 0) {
+                    continue;
+                }
+                double s = p.slopeTo(q);
+                // StdOut.println(String.format("    Q %s %f j %d", q, s, j));
+                // find runs of size 3+
+                int rlen = 0;
+                for (int k = j + 1; k < N; k++) {
+                    Point r = pts[k];
+                    if (p.slopeTo(r) != s) {
                         break;
                     }
+                    // StdOut.println(String.format("   k %d %f", k,
+                    // p.slopeTo(pts[k])));
+                    // skip if p is not lexicographically first in the run
+                    if (r.compareTo(p) < 0) {
+                        rlen = 0;
+                        break;
+                    }
+                    rlen++;
                 }
-                if (count >= 2) {
-                    StdOut.println(String.format("j %d count %d, PQ %f", j, count,
-                           slopePQ));
-                    /**
-                     * Given a point p you can find a set of points {p1, p2 ...
-                     * pn} which are collinear with p and which occur in the
-                     * list after p. But is this set a subset of something
-                     * you've already printed? It is if and only if there is a
-                     * point p0, which is before p, and which is collinear with
-                     * p1...pn.
-                     * 
-                     * In other words, you can check if there is a point before
-                     * p, with the same slope with it as p1...pn. This can even
-                     * be done with logarithmic complexity.
-                     */
-                    for (int s = 0; s < j; s++) {
-                        StdOut.println("check " + p.slopeTo(pts[s]));
-                        if (equal(p.slopeTo(pts[s]), slopePQ)) {
-                            StdOut.println("**** ALREADY PRINTED " + pts[s]);
-                            count = 0;
-                        }
+                if (rlen >= 2) {
+                    found++;
+                    rlen += 2;
+                    Point coll[] = new Point[rlen];
+                    // copy, sort and display found set
+                    coll[0] = p;
+                    coll[1] = q;
+                    int m = j + 1;
+                    for (int x = 2; x < rlen; x++) {
+                        coll[x] = pts[m];
+                        m++;
                     }
-                    if (count > 0) {
-                        //count += 2;
-                        found++;
-                        display(coll, count + 2);
-                        //j += count - 3;
-                        //i += count - 4;
-                        //StdOut.println(String.format("count %d, i %d, j %d", count,
-                        //        i, j));
-                    }
+                    // jump to point after the run (-1)
+                    j = m - 1;
+                    Arrays.sort(coll);
+                    display(coll);
+                    // p.drawTo(pts[j]);
+                    // StdOut.println(String.format("  FOUND run with size %d, PQ %f, next j %d",
+                    // rlen+2, s, j));
                 }
             }
         }
         StdDraw.show(0);
-        StdOut.println("found " + found);
+        //StdOut.println("found " + found);
     }
 
-    private static void display(Point[] coll, int l) {
-        //Arrays.sort(coll, 0, l);
+    private static void display(Point[] coll) {
+        int l = coll.length;
         coll[0].drawTo(coll[l - 1]);
         StdOut.print(coll[0]);
         for (int i = 1; i < l; i++) {
