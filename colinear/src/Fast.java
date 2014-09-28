@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -50,7 +49,6 @@ public class Fast {
     public static void main(String[] args) {
         // read in the input
         String filename = args[0];
-        ArrayList<String> found_seg = new ArrayList<String>();
         In in = new In(filename);
         int N = in.readInt();
         // StdOut.println("FAST File " + filename + ", " + N + " points");
@@ -72,7 +70,7 @@ public class Fast {
         StdDraw.setPenColor(StdDraw.BLUE);
 
         // initial sort
-        Arrays.sort(points);
+        //Arrays.sort(points);
         
         int found = 0;
         for (int i = 0; i < N; i++) {
@@ -123,24 +121,10 @@ public class Fast {
                     String seg = segment(coll);
                     // jump to point after the run (-1)
                     j = m - 1;
-                    // check for sub-segment
-                    for (int x=0; x<found_seg.size(); x++) {
-                        if (found_seg.get(x).contains(seg)) {
-                            rlen = 0;
-                            break;
-                        }
-                    }
-                    // subseq?
-                    if (rlen == 0) {
-                        //StdOut.println("SKIP " + seg);
-                        continue;
-                    }
                     // draw line first->last - will contain all points
                     coll[0].drawTo(coll[coll.length - 1]);
                     StdOut.println(seg);
-                    found_seg.add(seg);
                     found++;
-                    //display(coll);
                     //StdOut.println(String.format("  FOUND run %d with size %d, PQ %f, next j %d",
                     //        found, rlen, s, j));
                 }
@@ -151,7 +135,7 @@ public class Fast {
     }
 
     private static String segment(Point[] coll) {
-        StringBuffer seq = new StringBuffer();
+        StringBuilder seq = new StringBuilder();
         seq.append(coll[0]);
         for (int i = 1; i < coll.length; i++) {
             seq.append(" -> " + coll[i]);
